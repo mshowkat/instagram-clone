@@ -17,4 +17,12 @@
   padding: 10px 20px;
 }
 
+.app__signup {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
 
+.app__signupInput {
+  padding: 5px;
+}

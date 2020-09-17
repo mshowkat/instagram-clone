@@ -3,10 +3,10 @@ import logo from './logo192.png';
 import logo1 from './logo.svg';
 import './App.css';
 import Post from './Post';
-import {db} from './firebase'
+import {auth, db} from './firebase'
 import { makeStyles } from '@material-ui/core/styles'
 import Modal from '@material-ui/core/Modal'
-import {Button, TextField} from '@material-ui/core'
+import {Button, TextField, Input} from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -19,6 +19,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 function App() {
   const classes = useStyles();
   const [ modalStyle ] =useState(getModalStyle)
@@ -26,8 +28,31 @@ function App() {
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
   const [username, setUsername] = useState('');
-  const[password, setPassword] = useState('');
-  const[email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [user, setUser] = useState(null);
+  
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if(authUser) {
+          console.log(authUser);
+          setUser(authUser);
+        if (authUser.displayName) {
+          //dont update username
+        } else {
+          //if we just created something
+          return authUser.updateProfile({
+            displayName:username
+          })
+        }
+    } else {
+      setUser(null);
+    }})
+    return () => {
+      unsubscribe()
+    }
+  }, [user, username])
 
   useEffect(() => {
     db.collection('posts').onSnapshot(snapshot => {
@@ -39,21 +64,27 @@ function App() {
     })
   }, [])
 
-  
-  function getModalStyle() {
-    const top = 50;
-    const left = 50;
-  
-    return {
-      top: `${top}%`,
-      left: `${left}%`,
-      transform: `translate(-${top}%, -${left}%)`,
-    };
+  const signUp= (event) => {
+    event.preventDefault();
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((authUser) => {
+        return      authUser.user.updateProfile({
+        displayName : username
+      })
+    })
+    .catch((error) => alert(error.message))
   }
-
-  const signUp= (event => {
-
-  })
+  
+            function getModalStyle() {
+              const top = 50;
+              const left = 50;
+            
+              return {
+                top: `${top}%`,
+                left: `${left}%`,
+                transform: `translate(-${top}%, -${left}%)`,
+              };
+            }
 
   return (
     <div className="App">
@@ -64,14 +95,33 @@ function App() {
         // aria-describedby="simple-modal-description
       >
          <div style={modalStyle} className={classes.paper}>
-          <h2 id="simple-modal-title">Login form</h2>
-          <Input 
-            type='text'
-            placeholder ='username'
-            value = {username}
-            onChange = {(e) => setUsername(e.target.value)}
-          />
-          <Button> Login </Button>
+          <form action="" className='app__signup'>
+            <img className="app__headerImage" src={logo} alt="logo icon"/>
+            {/* <h2 id="simple-modal-title">insta Clone Login form</h2> */}
+            <Input 
+              type='text'
+              placeholder ='username'
+              className = 'app__signupInput'
+              value = {username}
+              onChange = {(e) => setUsername(e.target.value)}
+            />
+            <Input 
+              type='text'
+              placeholder ='email'
+              className = 'app__signupInput'
+              value = {email}
+              onChange = {(e) => setEmail(e.target.value)}
+            />
+            <Input 
+              type='text'
+              placeholder ='Password'
+              className = 'app__signupInput'
+              value = {password}
+              onChange = {(e) => setPassword(e.target.value)}
+            />
+            
+            <Button type='submit' onClick={signUp}> SignUp </Button>
+          </form>
         </div>
       </Modal>
 
@@ -79,7 +129,7 @@ function App() {
       <div className="app__header">
         <img className="app__headerImage" src={logo} alt="logo icon"/>
       </div>
-        <Button onClick={() => setOpen(true)}> Login </Button>
+        <Button onClick={() => setOpen(true)}> SignUp </Button>
       <div>
         {
           posts.map(({id, post}) => (

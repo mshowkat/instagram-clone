@@ -23,8 +23,11 @@ function App() {
   const classes = useStyles();
   const [ modalStyle ] =useState(getModalStyle)
 
-  const [posts, setPosts] = useState([])
-  const [open, setOpen] = useState(false)
+  const [posts, setPosts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const[password, setPassword] = useState('');
+  const[email, setEmail] = useState('');
 
   useEffect(() => {
     db.collection('posts').onSnapshot(snapshot => {
@@ -62,9 +65,13 @@ function App() {
       >
          <div style={modalStyle} className={classes.paper}>
           <h2 id="simple-modal-title">Login form</h2>
-          <TextField>User name</TextField>
-          <TextField>User name</TextField>
-          <Button onClick={}> Login </Button>
+          <Input 
+            type='text'
+            placeholder ='username'
+            value = {username}
+            onChange = {(e) => setUsername(e.target.value)}
+          />
+          <Button> Login </Button>
         </div>
       </Modal>
 

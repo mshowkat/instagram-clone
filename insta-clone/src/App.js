@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo192.png';
 import logo1 from './logo.svg';
 import './App.css';
-import Post from './Post'
+import Post from './Post';
+import {db} from './firebase'
 
 function App() {
-  const [posts, setpost] = useState([
-    {
-      userName: "JustShowkat",
-      caption: "new day to learn react",
-      imageUrl: logo1,
-    },
-    {
-      userName: "JustShowkat",
-      caption: "new day to learn react",
-      imageUrl: logo
-    },
-  ])
+  const [posts, setPosts] = useState([])
+
+  useEffect(() => {
+    db.collection('posts').onSnapshot(snapshot => {
+      //everytime a new post is addedd here, fire this code.
+      setPosts(snapshot.docs.map(doc => ({
+        id: doc.id,
+        post: doc.data()
+      })))
+    })
+  }, [])
   
   return (
     <div className="App">
@@ -25,8 +25,8 @@ function App() {
       </div>
       <div>
         {
-          posts.map(post => (
-            <Post userName={post.userName} caption={post.caption} imageUrl={post.imageUrl} />
+          posts.map(({id, post}) => (
+            <Post key={id} userName={post.userName} caption={post.caption} imageUrl={post.imageUrl} />
           ))
         }
         {/* <Post userName="JustShowkat" caption="new day to learn react" imageUrl={logo1} />

@@ -4,6 +4,7 @@
     margin: 45px 20px;
     padding: 20px;
     border: 1px solid indigo;
+    border-radius: 10px;
 }
 .post__image{
     align-items: center;

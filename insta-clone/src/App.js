@@ -4,9 +4,27 @@ import logo1 from './logo.svg';
 import './App.css';
 import Post from './Post';
 import {db} from './firebase'
+import { makeStyles } from '@material-ui/core/styles'
+import Modal from '@material-ui/core/Modal'
+import {Button, TextField} from '@material-ui/core'
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
 
 function App() {
+  const classes = useStyles();
+  const [ modalStyle ] =useState(getModalStyle)
+
   const [posts, setPosts] = useState([])
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     db.collection('posts').onSnapshot(snapshot => {
@@ -17,12 +35,44 @@ function App() {
       })))
     })
   }, [])
+
   
+  function getModalStyle() {
+    const top = 50;
+    const left = 50;
+  
+    return {
+      top: `${top}%`,
+      left: `${left}%`,
+      transform: `translate(-${top}%, -${left}%)`,
+    };
+  }
+
+  const signUp= (event => {
+
+  })
+
   return (
     <div className="App">
+       <Modal
+        open={open}
+        onClose={() =>  setOpen(false)}
+        aria-labelledby="simple-modal-title"
+        // aria-describedby="simple-modal-description
+      >
+         <div style={modalStyle} className={classes.paper}>
+          <h2 id="simple-modal-title">Login form</h2>
+          <TextField>User name</TextField>
+          <TextField>User name</TextField>
+          <Button onClick={}> Login </Button>
+        </div>
+      </Modal>
+
+
       <div className="app__header">
         <img className="app__headerImage" src={logo} alt="logo icon"/>
       </div>
+        <Button onClick={() => setOpen(true)}> Login </Button>
       <div>
         {
           posts.map(({id, post}) => (
